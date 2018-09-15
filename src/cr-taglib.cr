@@ -101,20 +101,22 @@ module TagLib
 			end
 		{% end %}
 	end
-	class MPEG::File
-		def initialize( filename : (::String) )
-			raise Errno.new("No such file") if !::File.exists?(filename)
-			@ptr = Library.taglib_file_new_type( filename, Library::FileType::MPEG )
-			yield self
+	{% for filetype,e in {"MPEG"=>"MPEG","Ogg"=>"OggVorbis","MP4" => "MP4", "RIFF::Wav" => "WavPack", "FLAC" => "FLAC"} %}
+		class {{filetype.id}}::File
+			def initialize( filename : (::String) )
+				raise Errno.new("No such file") if !::File.exists?(filename)
+				@ptr = Library.taglib_file_new_type( filename, Library::FileType::{{e.id}} )
+				yield self
+			end
+			def audio_properties()
+				@ap ||= AudioProperties.new( Library.taglib_file_audioproperties( @ptr ) )
+			end
+			def tag()
+				@tag ||= Tag.new( Library.taglib_file_tag( @ptr ) )
+			end
+			def save()
+				Library.taglib_file_save( @ptr )
+			end
 		end
-		def audio_properties()
-			@ap ||= AudioProperties.new( Library.taglib_file_audioproperties( @ptr ) )
-		end
-		def tag()
-			@tag ||= Tag.new( Library.taglib_file_tag( @ptr ) )
-		end
-		def save()
-			Library.taglib_file_save( @ptr )
-		end
-	end
+	{% end %}
 end

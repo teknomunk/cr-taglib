@@ -125,7 +125,6 @@ describe TagLib do
 		}
 	end
 
-
 	it "works" do
 		false.should eq(true)
 	end
