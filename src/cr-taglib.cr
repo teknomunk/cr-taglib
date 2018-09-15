@@ -108,6 +108,9 @@ module TagLib
 				@ptr = Library.taglib_file_new_type( filename, Library::FileType::{{e.id}} )
 				yield self
 			end
+			def finalize()
+				Library.taglib_file_free( @ptr )
+			end
 			def audio_properties()
 				@ap ||= AudioProperties.new( Library.taglib_file_audioproperties( @ptr ) )
 			end
